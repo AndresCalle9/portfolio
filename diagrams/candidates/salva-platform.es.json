@@ -456,7 +456,7 @@
       "sublabel": "dispositivo de bioimpedancia",
       "pos": [
         40,
-        236
+        300
       ],
       "size": [
         150,
@@ -464,16 +464,31 @@
       ]
     },
     {
-      "id": "clinic",
+      "id": "app",
       "type": "frontend",
       "label": "App clínica",
-      "sublabel": "hospitales y empresas",
+      "sublabel": "funciona sin conexión",
       "pos": [
-        40,
-        380
+        280,
+        300
       ],
       "size": [
-        150,
+        140,
+        64
+      ],
+      "tag": "zonas rurales"
+    },
+    {
+      "id": "localdb",
+      "type": "database",
+      "label": "BD local",
+      "sublabel": "pruebas sin conexión",
+      "pos": [
+        280,
+        480
+      ],
+      "size": [
+        140,
         64
       ]
     },
@@ -483,7 +498,7 @@
       "label": "Ingress",
       "sublabel": "HTTPS",
       "pos": [
-        270,
+        520,
         300
       ],
       "size": [
@@ -497,7 +512,7 @@
       "label": "Autenticación",
       "sublabel": "tokens y roles",
       "pos": [
-        270,
+        520,
         130
       ],
       "size": [
@@ -506,33 +521,18 @@
       ]
     },
     {
-      "id": "ingest",
+      "id": "analysis",
       "type": "backend",
-      "label": "Ingesta de señal",
-      "sublabel": "Node.js · TypeScript",
-      "pos": [
-        520,
-        300
-      ],
-      "size": [
-        150,
-        64
-      ]
-    },
-    {
-      "id": "inference",
-      "type": "backend",
-      "label": "Inferencia IA",
+      "label": "Análisis IA",
       "sublabel": "modelos propios",
       "pos": [
-        790,
+        750,
         300
       ],
       "size": [
-        150,
+        140,
         64
-      ],
-      "tag": "tiempo real"
+      ]
     },
     {
       "id": "results",
@@ -540,11 +540,11 @@
       "label": "Resultados",
       "sublabel": "informe por prueba",
       "pos": [
-        1050,
+        980,
         300
       ],
       "size": [
-        150,
+        140,
         64
       ]
     },
@@ -554,8 +554,8 @@
       "label": "Servicios de dominio",
       "sublabel": "Node.js · TypeScript",
       "pos": [
-        270,
-        500
+        520,
+        480
       ],
       "size": [
         140,
@@ -568,11 +568,25 @@
       "label": "SQL",
       "sublabel": "datos clínicos",
       "pos": [
-        1050,
-        500
+        980,
+        480
       ],
       "size": [
-        150,
+        140,
+        64
+      ]
+    },
+    {
+      "id": "external",
+      "type": "external",
+      "label": "Sistemas externos",
+      "sublabel": "integraciones",
+      "pos": [
+        520,
+        650
+      ],
+      "size": [
+        140,
         64
       ]
     }
@@ -584,8 +598,7 @@
       "wraps": [
         "ingress",
         "auth",
-        "ingest",
-        "inference",
+        "analysis",
         "results",
         "domain",
         "sql"
@@ -594,17 +607,27 @@
   ],
   "connections": [
     {
-      "id": "device-ingress",
+      "id": "device-app",
       "from": "device",
-      "to": "ingress",
-      "label": "HTTPS",
+      "to": "app",
+      "label": "Bluetooth",
       "variant": "emphasis"
     },
     {
-      "id": "clinic-ingress",
-      "from": "clinic",
+      "id": "app-localdb",
+      "from": "app",
+      "to": "localdb",
+      "label": "guarda offline",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "app-ingress",
+      "from": "app",
       "to": "ingress",
-      "label": "HTTPS"
+      "label": "sincroniza",
+      "variant": "emphasis"
     },
     {
       "id": "ingress-auth",
@@ -616,22 +639,15 @@
       "toSide": "bottom"
     },
     {
-      "id": "ingress-ingest",
+      "id": "ingress-analysis",
       "from": "ingress",
-      "to": "ingest",
-      "label": "señal cruda",
+      "to": "analysis",
+      "label": "lecturas",
       "variant": "emphasis"
     },
     {
-      "id": "ingest-inference",
-      "from": "ingest",
-      "to": "inference",
-      "label": "señal limpia",
-      "variant": "emphasis"
-    },
-    {
-      "id": "inference-results",
-      "from": "inference",
+      "id": "analysis-results",
+      "from": "analysis",
       "to": "results",
       "label": "anomalías",
       "variant": "emphasis"
@@ -657,9 +673,25 @@
       "from": "domain",
       "to": "sql",
       "label": "SQL"
+    },
+    {
+      "id": "domain-external",
+      "from": "domain",
+      "to": "external",
+      "label": "API",
+      "fromSide": "bottom",
+      "toSide": "top"
     }
   ],
   "cards": [
+    {
+      "dot": "violet",
+      "title": "En campo",
+      "items": [
+        "Conexión Bluetooth con el dispositivo Julieta",
+        "Pruebas sin conexión que se sincronizan al reconectar"
+      ]
+    },
     {
       "dot": "emerald",
       "title": "Plataforma",

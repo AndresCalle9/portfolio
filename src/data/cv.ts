@@ -14,8 +14,8 @@ export const person = {
   linkedin: 'https://www.linkedin.com/in/andres-calle-uribe',
   github: 'https://github.com/AndresCalle9',
   thesis: {
-    es: 'Construyo backends para software médico. Hoy, el de un dispositivo con IA para la detección temprana de cáncer de mama.',
-    en: 'I build backends for medical software. Right now, for an AI-powered device for early breast cancer detection.',
+    es: 'Construyo backends para software médico. Hoy, el de un dispositivo con IA para la detección de anomalías en tejido mamario.',
+    en: 'I build backends for medical software. Right now, for an AI-powered device that detects anomalies in breast tissue.',
   },
   profile: {
     es: 'Más de 6 años construyendo productos en Node.js y TypeScript, sobre todo arquitecturas de microservicios en Azure y AWS. Soy Ingeniero Biomédico con maestría, así que traduzco requisitos clínicos y regulatorios en decisiones de arquitectura. Lidero equipos, defino el roadmap técnico y formo desarrolladores.',
@@ -51,7 +51,7 @@ export const cases: Case[] = [
   {
     slug: 'salva-health-platform',
     diagram: 'salva-platform',
-    ratio: '16 / 9',
+    ratio: '4 / 3',
     title: { es: 'Plataforma clínica en Kubernetes', en: 'Clinical platform on Kubernetes' },
     org: 'Salva Health',
     years: '2024 –',
@@ -60,11 +60,13 @@ export const cases: Case[] = [
       en: '11 microservices on Azure AKS processing around 4,000 tests a month at over 99% availability.',
     },
     problem: {
-      es: 'Salva Health es una healthtech de detección temprana de cáncer de mama. La plataforma recibe las lecturas del dispositivo, las analiza con IA y entrega un informe al profesional de salud, todo bajo los requisitos de un software médico en proceso regulatorio.',
-      en: 'Salva Health is a healthtech company focused on early breast cancer detection. The platform receives readings from the device, analyses them with AI and delivers a report to the clinician, all under the requirements of medical software going through regulatory review.',
+      es: 'Comunicar la plataforma con un dispositivo médico por Bluetooth y hacer que funcione sin conexión, porque muchas pruebas se hacen en zonas rurales. Los datos viven repartidos entre bases locales y la nube, así que había que sincronizarlos de forma fiable, protegerlos como datos clínicos e integrarlos con otros sistemas.',
+      en: 'Connecting the platform to a medical device over Bluetooth and making it work offline, because many tests happen in rural areas. Data lives across local databases and the cloud, so it had to sync reliably, be protected as clinical data and integrate with other systems.',
     },
     work: [
       { es: 'Diseñé la arquitectura de 11 microservicios en Node.js y TypeScript, en contenedores Docker sobre Azure Kubernetes Service y con bases de datos SQL.', en: 'Designed the architecture: 11 Node.js and TypeScript microservices in Docker containers on Azure Kubernetes Service, backed by SQL databases.' },
+      { es: 'Diseñé la interfaz de comunicación Bluetooth entre la plataforma y el dispositivo Julieta.', en: 'Designed the Bluetooth interface between the platform and the Julieta device.' },
+      { es: 'Construí el funcionamiento sin conexión: las pruebas se guardan en local y se sincronizan al reconectar.', en: 'Built offline operation: tests are stored locally and synced once the connection is back.' },
       { es: 'Rediseñé los pipelines de CI/CD y reduje a la mitad el tamaño de las imágenes Docker.', en: 'Redesigned the CI/CD pipelines and halved the size of the Docker images.' },
       { es: 'Defino el roadmap técnico y los estándares de seguridad de datos, y lidero un equipo de 4 ingenieros.', en: 'Set the technical roadmap and data security standards, and lead a team of 4 engineers.' },
       { es: 'Participo en los procesos regulatorios INVIMA y en la evaluación inicial de ISO 13485 e HIPAA.', en: 'Take part in INVIMA regulatory processes and the initial ISO 13485 and HIPAA assessment.' },
@@ -92,8 +94,8 @@ export const cases: Case[] = [
       en: 'Bioimpedance signal acquisition and in-house AI models that detect anomalies in real time. Now in clinical trials.',
     },
     problem: {
-      es: 'Julieta es un dispositivo de bioimpedancia para la detección temprana de cáncer de mama. Cada prueba tiene que convertir una señal física en un resultado que un profesional de salud pueda revisar, con la trazabilidad que exige un ensayo clínico.',
-      en: 'Julieta is a bioimpedance device for early breast cancer detection. Every test has to turn a physical signal into a result a clinician can review, with the traceability a clinical trial requires.',
+      es: 'Llevar una señal física de bioimpedancia hasta modelos de IA en tiempo real, acondicionarla antes de evaluarla y registrar cada resultado de forma trazable para los ensayos clínicos.',
+      en: 'Getting a physical bioimpedance signal to AI models in real time, conditioning it before it is evaluated, and recording every result with full traceability for clinical trials.',
     },
     work: [
       { es: 'Desarrollé el software del dispositivo: adquisición y acondicionamiento de la señal.', en: 'Built the device software: signal acquisition and conditioning.' },
@@ -123,8 +125,8 @@ export const cases: Case[] = [
       en: 'Microservices on AWS for an iOS/Android app with food recognition and an assistant handling ~100,000 messages a month.',
     },
     problem: {
-      es: 'KutAI ayuda a las personas a mejorar sus hábitos nutricionales desde una app móvil, que reconoce alimentos a partir de una foto, y desde un asistente en WhatsApp. Ambos canales comparten los mismos datos.',
-      en: 'KutAI helps people improve their nutrition habits through a mobile app that recognises food from a photo, and through a WhatsApp assistant. Both channels share the same data.',
+      es: 'Dos canales, una app iOS/Android y un asistente en WhatsApp, escribían sobre los mismos datos. El webhook de WhatsApp tenía que responder rápido a un volumen alto de mensajes, y el equipo crecía, así que necesitaba estándares para no frenarse.',
+      en: 'Two channels, an iOS/Android app and a WhatsApp assistant, wrote to the same data. The WhatsApp webhook had to respond quickly to a high volume of messages, and the team was growing, so it needed standards to keep moving.',
     },
     work: [
       { es: 'Diseñé e implementé la arquitectura de microservicios en Node.js, TypeScript y Docker desplegada en AWS.', en: 'Designed and built the microservice architecture in Node.js, TypeScript and Docker, deployed on AWS.' },
@@ -159,7 +161,7 @@ export const experience: {
     place: { es: 'Medellín', en: 'Medellín' },
     from: '2024',
     to: { es: 'hoy', en: 'now' },
-    context: { es: 'Healthtech de detección temprana de cáncer de mama. Arquitectura de software y equipo de 4 ingenieros.', en: 'Early breast cancer detection healthtech. Software architecture and a team of 4 engineers.' },
+    context: { es: 'Healthtech de detección de anomalías en tejido mamario. Arquitectura de software y equipo de 4 ingenieros.', en: 'Healthtech for detecting anomalies in breast tissue. Software architecture and a team of 4 engineers.' },
     points: [
       { es: '11 microservicios Node.js/TypeScript en Azure AKS, ~4.000 pruebas al mes, disponibilidad >99%.', en: '11 Node.js/TypeScript microservices on Azure AKS, ~4,000 tests a month, >99% availability.' },
       { es: 'Software del dispositivo Julieta con IA propia, en ensayos clínicos.', en: 'Software for the Julieta device with in-house AI, now in clinical trials.' },

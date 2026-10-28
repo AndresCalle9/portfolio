@@ -9,6 +9,7 @@ status=0
 for json in diagrams/candidates/*.json; do
   base="diagrams/out/$(basename "${json%.json}")"
   type=$(node -p "require('./$json').diagram_type")
+  rm -f "$base".*  # Archify no sobrescribe recibos de ejecuciones anteriores
   if node "$ARCHIFY" finalize "$type" "$json" "$base.html" --quality showcase --json > "$base.log" 2>&1; then
     cp "$base.html" public/diagrams/
     echo "ok    $json"

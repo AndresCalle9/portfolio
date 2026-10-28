@@ -1,0 +1,222 @@
+---
+import { readouts, type Lang } from '../data/cv';
+import { useT } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useT(lang);
+
+// Onda de monitor determinista: línea base con ruido suave y un complejo
+// pico (q-R-s) en el centro de cada columna de lectura.
+const W = 1200;
+const H = 200;
+const BASE = 128;
+const peaks = readouts.map((_, i) => ((i + 0.5) * W) / readouts.length);
+const heights = [92, 108, 84, 100];
+
+const wobble = (x: number) =>
+  Math.sin(x / 38) * 3.2 + Math.sin(x / 11.7 + 1.3) * 1.4 + Math.sin(x / 5.3) * 0.6;
+
+const complex = (x: number) => {
+  let y = 0;
+  peaks.forEach((p, i) => {
+    const d = x - p;
+    y -= heights[i] * Math.exp(-(d * d) / (2 * 4.2 ** 2)); // R
+    y += 16 * Math.exp(-((d + 11) ** 2) / (2 * 3.2 ** 2)); // q
+    y += 24 * Math.exp(-((d - 12) ** 2) / (2 * 4 ** 2)); // s
+    y -= 10 * Math.exp(-((d - 52) ** 2) / (2 * 14 ** 2)); // T
+  });
+  return y;
+};
+
+const y = (x: number) => BASE + wobble(x) + complex(x);
+// Cima real de cada pico (el más alto entre los puntos muestreados cercanos)
+const tops = peaks.map((p) => {
+  let best = { x: p, y: y(p) };
+  for (let x = Math.round(p) - 8; x <= p + 8; x += 2) if (y(x) < best.y) best = { x, y: y(x) };
+  return best;
+});
+
+const points: string[] = [];
+for (let x = 0; x <= W; x += 2) points.push(`${x},${y(x).toFixed(1)}`);
+const d = `M${points.join('L')}`;
+---
+
+<figure class="trace" aria-label={t('hero.trace')}>
+  <div class="scope">
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
+      {peaks.map((p) => <line class="tick" x1={p} x2={p} y1={BASE + 34} y2={H} />)}
+      <path class="wave" d={d} pathLength="1" vector-effect="non-scaling-stroke" />
+    </svg>
+    {
+      tops.map((top, i) => (
+        <span
+          class="dot"
+          style={`left:${(top.x / W) * 100}%;top:${(top.y / H) * 100}%;--i:${i}`}
+          aria-hidden="true"
+        />
+      ))
+    }
+    <span class="cursor" style={`top:${(y(W) / H) * 100}%`} aria-hidden="true"></span>
+  </div>
+  <ol class="readouts">
+    {
+      readouts.map((r, i) => (
+        <li style={`--i:${i}`}>
+          <span class="value">{r.value}</span>
+          <span class="label">{r.label[lang]}</span>
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .trace {
+    --draw: 2.6s;
+    margin: 0;
+  }
+
+  .scope {
+    position: relative;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: clamp(110px, 16vw, 200px);
+    overflow: visible;
+  }
+
+  .wave {
+    fill: none;
+    stroke: var(--signal);
+    stroke-width: 1.75;
+    stroke-linejoin: round;
+  }
+
+  .tick {
+    stroke: var(--rule);
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .dot {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    margin: -4.5px 0 0 -4.5px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 2px solid var(--signal);
+  }
+
+  /* Punto vivo al final del trazo, como el cursor de un monitor */
+  .cursor {
+    position: absolute;
+    right: -4px;
+    width: 8px;
+    height: 8px;
+    margin-top: -4px;
+    border-radius: 50%;
+    background: var(--signal);
+    box-shadow: 0 0 0 0 var(--signal-soft);
+  }
+
+  .readouts {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .readouts li {
+    display: grid;
+    align-content: start;
+    justify-items: center;
+    text-align: center;
+    gap: 0.35rem;
+    padding: 0.9rem 0.75rem 0;
+  }
+
+  .value {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    font-size: clamp(1.35rem, 1rem + 1.3vw, 2rem);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .label {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: var(--muted);
+    max-width: 21ch;
+  }
+
+  @media (max-width: 640px) {
+    .readouts {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 1.25rem;
+    }
+
+    .tick {
+      display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .wave {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw var(--draw) linear 0.2s forwards;
+    }
+
+    /* Cada lectura aparece cuando el trazo pasa por su pico */
+    .dot,
+    .readouts li {
+      opacity: 0;
+      animation: appear 0.5s ease forwards;
+      animation-delay: calc(0.2s + var(--draw) * (var(--i) + 0.5) / 4);
+    }
+
+    .readouts li {
+      transform: translateY(6px);
+    }
+
+    .cursor {
+      opacity: 0;
+      animation:
+        appear 0.3s ease calc(var(--draw) + 0.2s) forwards,
+        pulse 1.6s ease-out calc(var(--draw) + 0.5s) infinite;
+    }
+  }
+
+  @keyframes draw {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes appear {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 var(--signal);
+    }
+    100% {
+      box-shadow: 0 0 0 10px transparent;
+    }
+  }
+</style>

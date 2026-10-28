@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Salva Health platform (simplified)",
+    "locale": "en",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "output": "diagrams/out/salva-platform.en.html"
+  },
+  "components": [
+    {
+      "id": "device",
+      "type": "external",
+      "label": "Julieta",
+      "sublabel": "bioimpedance device",
+      "pos": [
+        40,
+        236
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "clinic",
+      "type": "frontend",
+      "label": "Clinical app",
+      "sublabel": "hospitals and companies",
+      "pos": [
+        40,
+        380
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "ingress",
+      "type": "cloud",
+      "label": "Ingress",
+      "sublabel": "HTTPS",
+      "pos": [
+        270,
+        300
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "Authentication",
+      "sublabel": "tokens and roles",
+      "pos": [
+        270,
+        130
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "ingest",
+      "type": "backend",
+      "label": "Signal ingestion",
+      "sublabel": "Node.js · TypeScript",
+      "pos": [
+        520,
+        300
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "inference",
+      "type": "backend",
+      "label": "AI inference",
+      "sublabel": "in-house models",
+      "pos": [
+        790,
+        300
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "real time"
+    },
+    {
+      "id": "results",
+      "type": "backend",
+      "label": "Results",
+      "sublabel": "report per test",
+      "pos": [
+        1050,
+        300
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "domain",
+      "type": "backend",
+      "label": "Domain services",
+      "sublabel": "Node.js · TypeScript",
+      "pos": [
+        270,
+        500
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "sql",
+      "type": "database",
+      "label": "SQL",
+      "sublabel": "clinical data",
+      "pos": [
+        1050,
+        500
+      ],
+      "size": [
+        150,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Azure · Kubernetes (AKS)",
+      "wraps": [
+        "ingress",
+        "auth",
+        "ingest",
+        "inference",
+        "results",
+        "domain",
+        "sql"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "device-ingress",
+      "from": "device",
+      "to": "ingress",
+      "label": "HTTPS",
+      "variant": "emphasis"
+    },
+    {
+      "id": "clinic-ingress",
+      "from": "clinic",
+      "to": "ingress",
+      "label": "HTTPS"
+    },
+    {
+      "id": "ingress-auth",
+      "from": "ingress",
+      "to": "auth",
+      "label": "verify token",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "id": "ingress-ingest",
+      "from": "ingress",
+      "to": "ingest",
+      "label": "raw signal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ingest-inference",
+      "from": "ingest",
+      "to": "inference",
+      "label": "clean signal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "inference-results",
+      "from": "inference",
+      "to": "results",
+      "label": "anomalies",
+      "variant": "emphasis"
+    },
+    {
+      "id": "ingress-domain",
+      "from": "ingress",
+      "to": "domain",
+      "label": "REST",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "results-sql",
+      "from": "results",
+      "to": "sql",
+      "label": "persist",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "domain-sql",
+      "from": "domain",
+      "to": "sql",
+      "label": "SQL"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Platform",
+      "items": [
+        "11 Node.js/TypeScript microservices in Docker on AKS",
+        "~4,000 tests a month at over 99% availability"
+      ]
+    },
+    {
+      "dot": "cyan",
+      "title": "Delivery",
+      "items": [
+        "Deploys cut from 12 to 3–4 min after a CI/CD redesign",
+        "Docker images down from 400–500 MB to 200–250 MB"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Regulated setting",
+      "items": [
+        "INVIMA regulatory processes",
+        "Initial ISO 13485 and HIPAA assessment"
+      ]
+    }
+  ]
+}

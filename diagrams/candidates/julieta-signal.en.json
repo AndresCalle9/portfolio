@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "Julieta: from signal to report",
+    "locale": "en",
+    "viewBox": [
+      1080,
+      540
+    ],
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "output": "diagrams/out/julieta-signal.en.html"
+  },
+  "stages": [
+    {
+      "label": "Capture"
+    },
+    {
+      "label": "Signal"
+    },
+    {
+      "label": "Analysis"
+    },
+    {
+      "label": "Result"
+    },
+    {
+      "label": "Review"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "probe",
+      "type": "external",
+      "label": "Julieta",
+      "sublabel": "bioimpedance",
+      "stage": 0,
+      "row": 1
+    },
+    {
+      "id": "acquire",
+      "type": "backend",
+      "label": "Acquisition",
+      "sublabel": "conditions the signal",
+      "stage": 1,
+      "row": 1
+    },
+    {
+      "id": "model",
+      "type": "backend",
+      "label": "AI model",
+      "sublabel": "anomaly detection",
+      "stage": 2,
+      "row": 1,
+      "tag": "in-house"
+    },
+    {
+      "id": "report",
+      "type": "backend",
+      "label": "Report",
+      "sublabel": "test result",
+      "stage": 3,
+      "row": 1
+    },
+    {
+      "id": "store",
+      "type": "database",
+      "label": "SQL",
+      "sublabel": "clinical record",
+      "stage": 3,
+      "row": 2
+    },
+    {
+      "id": "clinician",
+      "type": "frontend",
+      "label": "Clinician",
+      "sublabel": "reviews the report",
+      "stage": 4,
+      "row": 1
+    }
+  ],
+  "flows": [
+    {
+      "id": "raw",
+      "from": "probe",
+      "to": "acquire",
+      "label": "raw signal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "conditioned",
+      "from": "acquire",
+      "to": "model",
+      "label": "clean signal",
+      "variant": "emphasis"
+    },
+    {
+      "id": "findings",
+      "from": "model",
+      "to": "report",
+      "label": "findings",
+      "variant": "emphasis"
+    },
+    {
+      "id": "persist",
+      "from": "report",
+      "to": "store",
+      "label": "record",
+      "variant": "dashed",
+      "classification": "clinical data",
+      "labelDy": 25
+    },
+    {
+      "id": "deliver",
+      "from": "report",
+      "to": "clinician",
+      "label": "report",
+      "variant": "security",
+      "classification": "role-based access"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "In clinical trials",
+      "items": [
+        "13,000+ tests performed",
+        "20+ pilots with hospitals and companies"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "Real-time AI",
+      "items": [
+        "In-house models built into the test flow"
+      ]
+    }
+  ]
+}

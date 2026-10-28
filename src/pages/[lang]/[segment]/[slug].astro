@@ -1,0 +1,185 @@
+---
+import Base from '../../../layouts/Base.astro';
+import Diagram from '../../../components/Diagram.astro';
+import { person, cases, languages, type Lang } from '../../../data/cv';
+import { useT, href, caseSegment, other } from '../../../i18n/ui';
+
+export const getStaticPaths = () =>
+  languages.flatMap((lang) =>
+    cases.map((c, i) => ({
+      params: { lang, segment: caseSegment[lang], slug: c.slug },
+      props: { index: i },
+    })),
+  );
+
+const lang = Astro.params.lang as Lang;
+const { index } = Astro.props;
+const c = cases[index];
+const next = cases[(index + 1) % cases.length];
+const t = useT(lang);
+const alt = other(lang);
+---
+
+<Base
+  lang={lang}
+  title={`${c.title[lang]} · ${person.name}`}
+  description={c.summary[lang]}
+  alternate={[alt, caseSegment[alt], c.slug]}
+>
+  <article class="page">
+    <header class="case-head">
+      <a class="back mono" href={`${href(lang)}#work`}>← {t('case.back')}</a>
+      <p class="mono muted meta">{c.org} · {c.years}</p>
+      <h1>{c.title[lang]}</h1>
+      <p class="summary">{c.summary[lang]}</p>
+      <ul class="stack mono" aria-label="Stack">
+        {c.stack.map((s) => <li>{s}</li>)}
+      </ul>
+    </header>
+
+    <section class="section" aria-labelledby="context">
+      <h2 class="section-label" id="context">{t('case.context')}</h2>
+      <p class="prose">{c.problem[lang]}</p>
+    </section>
+
+    <section class="section" aria-labelledby="diagram">
+      <h2 class="section-label" id="diagram">{t('case.diagram')}</h2>
+      <div>
+        <Diagram lang={lang} name={c.diagram} title={c.title[lang]} ratio={c.ratio} />
+        <p class="note muted">{c.note[lang]}</p>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="work-done">
+      <h2 class="section-label" id="work-done">{t('case.work')}</h2>
+      <ul class="work">
+        {c.work.map((w) => <li>{w[lang]}</li>)}
+      </ul>
+    </section>
+
+    <section class="section" aria-labelledby="results">
+      <h2 class="section-label" id="results">{t('case.results')}</h2>
+      <ul class="results">
+        {c.results.map((r) => <li>{r[lang]}</li>)}
+      </ul>
+    </section>
+
+    <nav class="next" aria-label={t('case.next')}>
+      <a href={href(lang, caseSegment[lang], next.slug)}>
+        <span class="mono muted">{t('case.next')} →</span>
+        <span class="next-title">{next.title[lang]}</span>
+      </a>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .case-head {
+    padding-block: clamp(2rem, 6vw, 4.5rem) clamp(2.5rem, 6vw, 4rem);
+  }
+
+  .back {
+    text-decoration: none;
+    color: var(--muted);
+  }
+
+  .back:hover {
+    color: var(--signal);
+  }
+
+  .meta {
+    margin-top: clamp(2rem, 6vw, 3.5rem);
+  }
+
+  h1 {
+    font-size: var(--step-3);
+    font-stretch: 75%;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    max-width: 20ch;
+    margin-top: 0.75rem;
+  }
+
+  .summary {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 48ch;
+    margin-top: 1.25rem;
+  }
+
+  .stack {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .stack li {
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.15rem 0.7rem;
+  }
+
+  .prose {
+    max-width: var(--measure);
+    font-size: var(--step-1);
+    line-height: 1.55;
+  }
+
+  .note {
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    font-style: italic;
+  }
+
+  .work {
+    padding-left: 1.1rem;
+    max-width: var(--measure);
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .work li::marker {
+    color: var(--signal);
+  }
+
+  .results {
+    list-style: none;
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .results li {
+    font-family: var(--font-display);
+    font-stretch: 80%;
+    font-weight: 600;
+    font-size: var(--step-2);
+    line-height: 1.15;
+    padding-block: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .next {
+    border-top: 1px solid var(--rule);
+    padding-block: 2.5rem 4rem;
+  }
+
+  .next a {
+    display: grid;
+    gap: 0.4rem;
+    text-decoration: none;
+  }
+
+  .next-title {
+    font-family: var(--font-display);
+    font-stretch: 78%;
+    font-weight: 650;
+    font-size: var(--step-2);
+    line-height: 1.1;
+  }
+
+  .next a:hover .next-title {
+    color: var(--signal);
+  }
+</style>

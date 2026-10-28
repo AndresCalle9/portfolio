@@ -1,0 +1,72 @@
+---
+import type { Lang } from '../data/cv';
+import { useT, asset } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  name: string;
+  title: string;
+  ratio?: string;
+}
+
+const { lang, name, title, ratio = '16 / 9' } = Astro.props;
+const t = useT(lang);
+const src = asset(`diagrams/${name}.${lang}.html`);
+---
+
+<figure class="diagram">
+  <div class="frame" style={`--ratio:${ratio}`}>
+    <iframe data-src={src} title={title} loading="lazy"></iframe>
+    <noscript><iframe src={`${src}?embed=1`} title={title} loading="lazy"></iframe></noscript>
+  </div>
+  <figcaption class="mono muted">
+    <span>{t('case.diagramHint')}</span>
+    <a href={src} target="_blank" rel="noopener">{t('case.diagramOpen')} ↗</a>
+  </figcaption>
+</figure>
+
+<script>
+  // El visor de Archify acepta ?embed=1&theme=light|dark: lo sincronizamos con el tema del sitio.
+  const theme = () =>
+    document.documentElement.dataset.theme ??
+    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+  const frames = document.querySelectorAll<HTMLIFrameElement>('.diagram iframe[data-src]');
+  const load = () =>
+    frames.forEach((frame) => {
+      frame.src = `${frame.dataset.src}?embed=1&theme=${theme()}`;
+    });
+
+  load();
+  window.addEventListener('themechange', load);
+</script>
+
+<style>
+  .diagram {
+    margin: 0;
+  }
+
+  .frame {
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--paper);
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    min-height: 420px;
+    max-height: 90vh;
+    border: 0;
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1.5rem;
+    margin-top: 0.75rem;
+  }
+</style>

@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "KutAI: app and WhatsApp assistant (simplified)",
+    "locale": "en",
+    "animation": "trace",
+    "quality_profile": "showcase",
+    "output": "diagrams/out/kutai-whatsapp.en.html"
+  },
+  "components": [
+    {
+      "id": "user",
+      "type": "external",
+      "label": "User",
+      "sublabel": "nutrition habits",
+      "pos": [
+        40,
+        100
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "whatsapp",
+      "type": "cloud",
+      "label": "WhatsApp",
+      "sublabel": "Business API",
+      "pos": [
+        290,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "webhook",
+      "type": "backend",
+      "label": "Webhook",
+      "sublabel": "Node.js · Express",
+      "pos": [
+        540,
+        100
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "tag": "~100k msg/mo"
+    },
+    {
+      "id": "assistant",
+      "type": "backend",
+      "label": "Assistant",
+      "sublabel": "conversation logic",
+      "pos": [
+        800,
+        100
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "mongo",
+      "type": "database",
+      "label": "MongoDB",
+      "sublabel": "nutrition data",
+      "pos": [
+        800,
+        290
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "mobile",
+      "type": "frontend",
+      "label": "App iOS / Android",
+      "sublabel": "900 users",
+      "pos": [
+        290,
+        470
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "API",
+      "sublabel": "GraphQL · REST",
+      "pos": [
+        540,
+        470
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "vision",
+      "type": "backend",
+      "label": "Food recognition",
+      "sublabel": "from a photo",
+      "pos": [
+        800,
+        470
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "firebase",
+      "type": "cloud",
+      "label": "Firebase",
+      "sublabel": "app data",
+      "pos": [
+        290,
+        640
+      ],
+      "size": [
+        140,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "AWS · Docker",
+      "wraps": [
+        "webhook",
+        "assistant",
+        "mongo",
+        "api",
+        "vision"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "user-wa",
+      "from": "user",
+      "to": "whatsapp",
+      "label": "message",
+      "variant": "emphasis"
+    },
+    {
+      "id": "wa-webhook",
+      "from": "whatsapp",
+      "to": "webhook",
+      "label": "webhook",
+      "variant": "emphasis"
+    },
+    {
+      "id": "webhook-assistant",
+      "from": "webhook",
+      "to": "assistant",
+      "label": "event",
+      "variant": "emphasis"
+    },
+    {
+      "id": "assistant-mongo",
+      "from": "assistant",
+      "to": "mongo",
+      "label": "read / write",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "user-mobile",
+      "from": "user",
+      "to": "mobile",
+      "label": "uses the app",
+      "fromSide": "bottom",
+      "toSide": "left"
+    },
+    {
+      "id": "mobile-api",
+      "from": "mobile",
+      "to": "api",
+      "label": "GraphQL",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-vision",
+      "from": "api",
+      "to": "vision",
+      "label": "photo",
+      "variant": "emphasis"
+    },
+    {
+      "id": "api-mongo",
+      "from": "api",
+      "to": "mongo",
+      "label": "query",
+      "fromSide": "top",
+      "toSide": "left"
+    },
+    {
+      "id": "mobile-firebase",
+      "from": "mobile",
+      "to": "firebase",
+      "label": "sync",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "Product",
+      "items": [
+        "Mobile app with photo-based food recognition",
+        "WhatsApp assistant: ~100,000 messages a month"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "Engineering",
+      "items": [
+        "OpenAPI/Swagger, automated tests and code review",
+        "Team of 12, 3 reporting to me"
+      ]
+    }
+  ]
+}

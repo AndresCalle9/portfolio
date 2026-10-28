@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+# Salidas intermedias de Archify (el HTML final vive en public/diagrams/)
+diagrams/out/
+# CV en PDF: no se publica por ahora (incluye teléfonos personales)
+public/cv/

@@ -1,0 +1,455 @@
+---
+import Base from '../../layouts/Base.astro';
+import SignalTrace from '../../components/SignalTrace.astro';
+import {
+  person,
+  cases,
+  experience,
+  openSource,
+  skills,
+  education,
+  spoken,
+  languages,
+  type Lang,
+} from '../../data/cv';
+import { useT, href, asset, caseSegment, other } from '../../i18n/ui';
+
+export const getStaticPaths = () => languages.map((lang) => ({ params: { lang } }));
+
+const lang = Astro.params.lang as Lang;
+const t = useT(lang);
+---
+
+<Base lang={lang} title={`${person.name} · ${person.role[lang]}`} alternate={[other(lang)]}>
+  <section class="page hero">
+    <p class="eyebrow mono">
+      <span>{person.role[lang]}</span>
+      <span class="sep" aria-hidden="true">/</span>
+      <span>{person.stack}</span>
+    </p>
+    <h1>{person.name}</h1>
+    <p class="thesis">{person.thesis[lang]}</p>
+    <p class="where mono muted">{person.location[lang]}</p>
+    <div class="trace-wrap">
+      <SignalTrace lang={lang} />
+    </div>
+  </section>
+
+  <div class="page">
+    <section class="section" aria-labelledby="profile">
+      <h2 class="section-label" id="profile">{t('section.profile')}</h2>
+      <p class="lead reveal">{person.profile[lang]}</p>
+    </section>
+
+    <section class="section" id="work" aria-labelledby="work-title">
+      <h2 class="section-label" id="work-title">{t('section.cases')}</h2>
+      <div>
+        <p class="intro muted reveal">{t('section.casesIntro')}</p>
+        <ul class="cases">
+          {
+            cases.map((c) => (
+              <li class="case reveal">
+                <a href={href(lang, caseSegment[lang], c.slug)}>
+                  <span class="case-meta mono muted">
+                    {c.org} · {c.years}
+                  </span>
+                  <h3>{c.title[lang]}</h3>
+                  <p>{c.summary[lang]}</p>
+                  <span class="case-cta mono">{t('case.open')} →</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <section class="section" id="experience" aria-labelledby="experience-title">
+      <h2 class="section-label" id="experience-title">{t('section.experience')}</h2>
+      <ol class="timeline">
+        {
+          experience.map((job) => (
+            <li class="job reveal">
+              <p class="when mono muted">
+                {job.from} – {job.to[lang]}
+              </p>
+              <div>
+                <h3>
+                  {job.role[lang]} <span class="at">· {job.org}</span>
+                </h3>
+                <p class="job-context muted">
+                  {job.context[lang]} <span class="place">{job.place[lang]}.</span>
+                </p>
+                <ul class="points">
+                  {job.points.map((p) => (
+                    <li>{p[lang]}</li>
+                  ))}
+                </ul>
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+    </section>
+
+    <section class="section" aria-labelledby="oss-title">
+      <h2 class="section-label" id="oss-title">{t('section.openSource')}</h2>
+      <ul class="repos">
+        {
+          openSource.map((r) => (
+            <li class="reveal">
+              <h3 class="mono">{r.name}</h3>
+              <p>{r.text[lang]}</p>
+              <p class="repo-stack mono muted">{r.stack}</p>
+              <p class="repo-links mono">
+                <a href={r.url}>{t('repo.code')}</a>
+                {r.live && <a href={r.live}>{t('repo.live')}</a>}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <section class="section" aria-labelledby="skills-title">
+      <h2 class="section-label" id="skills-title">{t('section.skills')}</h2>
+      <dl class="skills reveal">
+        {
+          skills.map((s) => (
+            <div>
+              <dt>{s.area[lang]}</dt>
+              <dd class="muted">{s.items[lang]}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section class="section" aria-labelledby="edu-title">
+      <h2 class="section-label" id="edu-title">{t('section.education')}</h2>
+      <div class="edu-grid reveal">
+        <ul class="edu">
+          {
+            education.map((e) => (
+              <li>
+                <span class="mono muted">{e.years}</span>
+                <strong>{e.title[lang]}</strong>
+                <span class="muted">{e.school}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <div>
+          <h3 class="mono muted sub">{t('section.languages')}</h3>
+          <ul class="spoken">
+            {
+              spoken.map((s) => (
+                <li>
+                  <strong>{s.lang[lang]}</strong> <span class="muted">{s.level[lang]}</span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <h2 class="section-label" id="contact-title">{t('nav.contact')}</h2>
+      <div class="reveal">
+        <p class="contact-title">{t('section.contact')}</p>
+        <p class="muted">{t('contact.text')}</p>
+        <p class="email">
+          <a href={`mailto:${person.email}`}>{person.email}</a>
+        </p>
+        <p class="links mono">
+          <a href={person.linkedin}>LinkedIn</a>
+          <a href={person.github}>GitHub</a>
+          {/* Descarga del CV desactivada hasta decidir si se publica el número personal.
+              Para activarla: quitar public/cv/ del .gitignore y descomentar esta línea.
+          <a href={asset(`cv/andres-calle-uribe-cv-${lang}.pdf`)} download>{t('contact.cv')}</a>
+          */}
+        </p>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .hero {
+    padding-top: clamp(3rem, 9vw, 7rem);
+    padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  }
+
+  .eyebrow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.6rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .sep {
+    color: var(--signal);
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    font-stretch: 75%;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.9;
+    margin-left: -0.04em;
+  }
+
+  .thesis {
+    font-size: var(--step-1);
+    line-height: 1.45;
+    max-width: 36ch;
+    margin-top: clamp(1.25rem, 3vw, 2rem);
+  }
+
+  .where {
+    margin-top: 1rem;
+  }
+
+  .trace-wrap {
+    margin-top: clamp(2.5rem, 7vw, 4.5rem);
+  }
+
+  .lead {
+    font-size: var(--step-1);
+    line-height: 1.55;
+    max-width: var(--measure);
+  }
+
+  .intro {
+    max-width: var(--measure);
+    margin-bottom: 2rem;
+  }
+
+  /* Casos */
+  .cases {
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .case a {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.75rem 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    position: relative;
+  }
+
+  .case h3 {
+    font-size: var(--step-2);
+    max-width: 24ch;
+    transition: color 0.2s;
+  }
+
+  .case p {
+    max-width: var(--measure);
+    color: var(--muted);
+  }
+
+  .case-cta {
+    color: var(--signal);
+    margin-top: 0.25rem;
+  }
+
+  .case a::before {
+    content: '';
+    position: absolute;
+    left: calc(-1 * clamp(0.75rem, 2vw, 1.5rem));
+    top: 1.75rem;
+    bottom: 1.75rem;
+    width: 2px;
+    background: var(--signal);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+
+  .case a:hover::before,
+  .case a:focus-visible::before {
+    transform: scaleY(1);
+  }
+
+  .case a:hover h3 {
+    color: var(--signal);
+  }
+
+  /* Experiencia */
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 2.75rem;
+  }
+
+  .job {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 0.25rem 1.5rem;
+  }
+
+  .when {
+    padding-top: 0.3rem;
+  }
+
+  .job h3 {
+    font-size: var(--step-1);
+    font-stretch: 85%;
+    line-height: 1.2;
+  }
+
+  .at {
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .job-context {
+    margin-top: 0.4rem;
+    max-width: var(--measure);
+  }
+
+  .points {
+    margin-top: 0.75rem;
+    padding-left: 1.1rem;
+    max-width: var(--measure);
+  }
+
+  .points li {
+    margin-top: 0.3rem;
+  }
+
+  .points li::marker {
+    color: var(--signal);
+  }
+
+  @media (max-width: 560px) {
+    .job {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Repos */
+  .repos {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+    gap: 2rem 2.5rem;
+  }
+
+  .repos h3 {
+    font-size: 0.95rem;
+    font-weight: 500;
+    font-stretch: 100%;
+    letter-spacing: 0;
+    margin-bottom: 0.4rem;
+  }
+
+  .repos p {
+    font-size: 0.95rem;
+  }
+
+  .repo-stack {
+    margin-top: 0.6rem;
+  }
+
+  .repo-links {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.25rem;
+  }
+
+  /* Competencias */
+  .skills {
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .skills div {
+    display: grid;
+    grid-template-columns: 10rem minmax(0, 1fr);
+    gap: 0.25rem 1.5rem;
+  }
+
+  .skills dt {
+    font-weight: 700;
+  }
+
+  .skills dd {
+    margin: 0;
+  }
+
+  @media (max-width: 560px) {
+    .skills div {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Formación */
+  .edu-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    gap: 2rem 3rem;
+  }
+
+  @media (max-width: 760px) {
+    .edu-grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .edu,
+  .spoken {
+    list-style: none;
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .edu li {
+    display: grid;
+  }
+
+  .sub {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    font-weight: 500;
+    font-stretch: 100%;
+    letter-spacing: 0.01em;
+    margin-bottom: 1rem;
+  }
+
+  /* Contacto */
+  .contact-title {
+    font-family: var(--font-display);
+    font-stretch: 75%;
+    font-weight: 700;
+    font-size: var(--step-3);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin-bottom: 1rem;
+  }
+
+  .email {
+    font-size: clamp(1.15rem, 0.9rem + 1.4vw, 1.75rem);
+    margin-top: 1.5rem;
+    overflow-wrap: anywhere;
+  }
+
+  .email a {
+    text-decoration-color: var(--signal);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin-top: 1.25rem;
+  }
+</style>

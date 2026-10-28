@@ -1,0 +1,176 @@
+---
+import '../styles/global.css';
+import { person, type Lang } from '../data/cv';
+import { useT, href, other, asset } from '../i18n/ui';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description?: string;
+  /** Ruta equivalente en el otro idioma, p. ej. ['en', 'work', 'slug'] */
+  alternate: string[];
+}
+
+const { lang, title, description, alternate } = Astro.props;
+const t = useT(lang);
+const alt = other(lang);
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternateUrl = new URL(href(...alternate), Astro.site);
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description ?? t('meta.description')} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={lang} href={canonical} />
+    <link rel="alternate" hreflang={alt} href={alternateUrl} />
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description ?? t('meta.description')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={lang === 'es' ? 'es_ES' : 'en_US'} />
+    <meta name="theme-color" content="#f1f3f5" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0d1015" media="(prefers-color-scheme: dark)" />
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem('theme');
+        if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+      } catch {}
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{t('nav.skip')}</a>
+
+    <header class="page site-header">
+      <a class="home mono" href={href(lang)}>{person.name}</a>
+      <nav aria-label={lang === 'es' ? 'Principal' : 'Main'}>
+        <a href={`${href(lang)}#work`}>{t('nav.cases')}</a>
+        <a href={`${href(lang)}#experience`}>{t('nav.experience')}</a>
+        <a href={`${href(lang)}#contact`}>{t('nav.contact')}</a>
+        <span class="divider" aria-hidden="true"></span>
+        <a href={href(...alternate)} hreflang={alt} lang={alt} aria-label={t('lang.switchLabel')}>
+          {alt.toUpperCase()}
+        </a>
+        <button class="theme" type="button" aria-label={t('theme.toggle')} data-theme-toggle>
+          <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true">
+            <circle cx="10" cy="10" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"></circle>
+            <path d="M10 2.75a7.25 7.25 0 0 1 0 14.5z" fill="currentColor"></path>
+          </svg>
+        </button>
+      </nav>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="page site-footer mono muted">
+      <span>© {new Date().getFullYear()} {person.name}</span>
+      <span>{t('footer.built')}</span>
+    </footer>
+
+    <script>
+      const root = document.documentElement;
+      const current = () =>
+        root.dataset.theme ?? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+      document.querySelector('[data-theme-toggle]')?.addEventListener('click', () => {
+        const next = current() === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = next;
+        try {
+          localStorage.setItem('theme', next);
+        } catch {}
+        window.dispatchEvent(new CustomEvent('themechange', { detail: next }));
+      });
+
+      // Aparición al entrar en pantalla
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        },
+        { rootMargin: '0px 0px -10% 0px' },
+      );
+      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem 1.5rem;
+    padding-block: 1.5rem;
+  }
+
+  .home {
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem 1.25rem;
+    flex-wrap: wrap;
+    font-size: 0.95rem;
+  }
+
+  nav a {
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--signal);
+  }
+
+  .divider {
+    width: 1px;
+    height: 1rem;
+    background: var(--rule);
+  }
+
+  .theme {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin: -0.5rem -0.5rem -0.5rem -0.25rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    cursor: pointer;
+    border-radius: 50%;
+  }
+
+  .theme:hover {
+    color: var(--signal);
+  }
+
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 2rem;
+    padding-block: 2rem 2.5rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  @media (max-width: 560px) {
+    nav a[href*="#experience"] {
+      display: none;
+    }
+  }
+</style>
